@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fr.mapper.RecommendMapper">
+
+    <resultMap id="RecommendResult" type="com.fr.entity.Recommend">
+        <id column="id" property="id"/>
+        <result column="type" property="type"/>
+        <result column="good_id" property="goodId"/>
+    </resultMap>
+
+    <resultMap id="RecommendWithGoodsResult" type="java.util.Map">
+        <id column="id" property="id"/>
+        <result column="type" property="type"/>
+        <result column="good_id" property="goodId"/>
+        <result column="goods_name" property="goodsName"/>
+    </resultMap>
+
+    <select id="getAll" resultMap="RecommendResult">
+        SELECT id, type, good_id FROM recommend ORDER BY id DESC
+    </select>
+
+    <select id="getAllWithGoodsName" resultMap="RecommendWithGoodsResult">
+        SELECT r.id, CAST(r.type AS UNSIGNED) as type, r.good_id, g.name as goods_name
+        FROM recommend r
+        LEFT JOIN goods g ON r.good_id = g.id
+        ORDER BY r.id DESC
+    </select>
+
+    <insert id="insert" parameterType="com.fr.entity.Recommend">
+        INSERT INTO recommend(type, good_id) VALUES(#{type}, #{goodId})
+    </insert>
+
+    <delete id="deleteById">
+        DELETE FROM recommend WHERE id = #{id}
+    </delete>
+
+</mapper>

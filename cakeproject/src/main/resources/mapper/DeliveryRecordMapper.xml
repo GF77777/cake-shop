@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fr.mapper.DeliveryRecordMapper">
+
+    <insert id="addRecord" parameterType="com.fr.entity.DeliveryRecord" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO delivery_record (order_id, rider_id, status, remark)
+        VALUES (#{orderId}, #{riderId}, #{status}, #{remark})
+    </insert>
+
+    <select id="getByOrderId" resultType="com.fr.entity.DeliveryRecord">
+        SELECT * FROM delivery_record WHERE order_id = #{orderId} ORDER BY create_time DESC LIMIT 1
+    </select>
+
+    <select id="getByRiderId" resultType="com.fr.entity.DeliveryRecord">
+        SELECT * FROM delivery_record WHERE rider_id = #{riderId} ORDER BY create_time DESC
+    </select>
+
+    <update id="updateRecord" parameterType="com.fr.entity.DeliveryRecord">
+        UPDATE delivery_record SET
+        status = #{status},
+        remark = #{remark}
+        WHERE id = #{id}
+    </update>
+
+</mapper>

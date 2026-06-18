@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fr.mapper.OrderMapper">
+
+    <resultMap id="OrderResult" type="com.fr.entity.Order">
+        <id column="id" property="orderId"/>
+        <result column="total" property="total"/>
+        <result column="amount" property="amount"/>
+        <result column="status" property="status"/>
+        <result column="paytype" property="payType"/>
+        <result column="name" property="name"/>
+        <result column="phone" property="phone"/>
+        <result column="address" property="address"/>
+        <result column="datetime" property="dateTime"/>
+        <result column="user_id" property="userId"/>
+        <result column="rider_id" property="riderId"/>
+        <result column="rider_name" property="riderName"/>
+        <result column="rider_phone" property="riderPhone"/>
+        <result column="delivery_fee" property="deliveryFee"/>
+        <result column="accept_time" property="acceptTime"/>
+        <result column="delivery_time" property="deliveryTime"/>
+        <result column="remark" property="remark"/>
+    </resultMap>
+
+    <select id="getAll" resultMap="OrderResult">
+        SELECT id, total, amount, status, paytype, name, phone, address, datetime, user_id,
+               rider_id, rider_name, rider_phone, delivery_fee, accept_time, delivery_time, remark
+        FROM `order`
+        ORDER BY datetime DESC
+    </select>
+
+    <select id="getByUserId" resultMap="OrderResult">
+        SELECT id, total, amount, status, paytype, name, phone, address, datetime, user_id,
+               rider_id, rider_name, rider_phone, delivery_fee, accept_time, delivery_time, remark
+        FROM `order`
+        WHERE user_id = #{userId}
+        ORDER BY datetime DESC
+    </select>
+
+    <select id="getByUserIdAndKeyword" resultMap="OrderResult">
+        SELECT id, total, amount, status, paytype, name, phone, address, datetime, user_id,
+               rider_id, rider_name, rider_phone, delivery_fee, accept_time, delivery_time, remark
+        FROM `order`
+        WHERE user_id = #{userId}
+        AND (
+            id LIKE CONCAT('%', #{keyword}, '%') OR
+            name LIKE CONCAT('%', #{keyword}, '%') OR
+            phone LIKE CONCAT('%', #{keyword}, '%') OR
+            address LIKE CONCAT('%', #{keyword}, '%')
+        )
+        ORDER BY datetime DESC
+    </select>
+
+    <insert id="addOrder" useGeneratedKeys="true" keyProperty="orderId">
+        INSERT INTO `order` (total, amount, status, paytype, name, phone, address, datetime, user_id, delivery_fee)
+        VALUES (#{total}, #{amount}, #{status}, #{payType}, #{name}, #{phone}, #{address}, #{dateTime}, #{userId}, #{deliveryFee})
+    </insert>
+
+    <update id="updateOrder">
+        UPDATE `order` SET
+            status = #{status},
+            paytype = #{payType},
+            name = #{name},
+            phone = #{phone},
+            address = #{address}
+        WHERE id = #{orderId}
+    </update>
+
+    <update id="updateDeliveryFee">
+        UPDATE `order` SET
+            delivery_fee = #{deliveryFee}
+        WHERE id = #{orderId}
+    </update>
+
+    <delete id="delete">
+        DELETE FROM `order` WHERE id = #{orderId}
+    </delete>
+
+    <update id="deliverOrder">
+        UPDATE `order` SET status = 1 WHERE id = #{orderId}
+    </update>
+
+    <update id="confirmOrder">
+        UPDATE `order` SET status = 4 WHERE id = #{orderId}
+    </update>
+
+    <select id="getById" resultMap="OrderResult">
+        SELECT id, total, amount, status, paytype, name, phone, address, datetime, user_id,
+               rider_id, rider_name, rider_phone, delivery_fee, accept_time, delivery_time, remark
+        FROM `order`
+        WHERE id = #{orderId}
+    </select>
+
+    <select id="getPendingOrders" resultMap="OrderResult">
+        SELECT id, total, amount, status, paytype, name, phone, address, datetime, user_id,
+               rider_id, rider_name, rider_phone, delivery_fee, accept_time, delivery_time, remark
+        FROM `order`
+        WHERE status = 0
+        ORDER BY datetime DESC
+    </select>
+
+    <select id="getAcceptedOrders" resultMap="OrderResult">
+        SELECT id, total, amount, status, paytype, name, phone, address, datetime, user_id,
+               rider_id, rider_name, rider_phone, delivery_fee, accept_time, delivery_time, remark
+        FROM `order`
+        WHERE rider_id = #{riderId} AND status = 1
+        ORDER BY datetime DESC
+    </select>
+
+    <select id="getDeliveringOrders" resultMap="OrderResult">
+        SELECT id, total, amount, status, paytype, name, phone, address, datetime, user_id,
+               rider_id, rider_name, rider_phone, delivery_fee, accept_time, delivery_time, remark
+        FROM `order`
+        WHERE rider_id = #{riderId} AND status = 2
+        ORDER BY datetime DESC
+    </select>
+
+    <select id="getHistoryOrders" resultMap="OrderResult">
+        SELECT id, total, amount, status, paytype, name, phone, address, datetime, user_id,
+               rider_id, rider_name, rider_phone, delivery_fee, accept_time, delivery_time, remark
+        FROM `order`
+        WHERE rider_id = #{riderId} AND status IN (2, 3, 5)
+        ORDER BY datetime DESC
+    </select>
+
+    <update id="acceptOrder">
+        UPDATE `order` SET
+            rider_id = #{riderId},
+            rider_name = #{riderName},
+            rider_phone = #{riderPhone},
+            status = 1,
+            accept_time = NOW()
+        WHERE id = #{orderId} AND status = 0
+    </update>
+
+    <update id="startDelivery">
+        UPDATE `order` SET
+            status = 2
+        WHERE id = #{orderId} AND status = 1
+    </update>
+
+    <update id="completeDelivery">
+        UPDATE `order` SET
+            status = 3,
+            delivery_time = NOW()
+        WHERE id = #{orderId} AND status = 2
+    </update>
+
+    <update id="cancelOrder">
+        UPDATE `order` SET
+            status = 5
+        WHERE id = #{orderId}
+    </update>
+
+    <select id="getTodayOrderCount" resultType="int">
+        SELECT COUNT(*) FROM `order`
+        WHERE rider_id = #{riderId}
+          AND status = 3
+          AND DATE(delivery_time) = CURDATE()
+    </select>
+
+    <select id="getTodayIncome" resultType="double">
+        SELECT COALESCE(SUM(delivery_fee), 0) FROM `order`
+        WHERE rider_id = #{riderId}
+          AND status = 3
+          AND DATE(delivery_time) = CURDATE()
+    </select>
+
+    <select id="getMonthOrderCount" resultType="int">
+        SELECT COUNT(*) FROM `order`
+        WHERE rider_id = #{riderId}
+          AND status = 3
+          AND MONTH(delivery_time) = MONTH(NOW())
+          AND YEAR(delivery_time) = YEAR(NOW())
+    </select>
+
+    <select id="getMonthIncome" resultType="double">
+        SELECT COALESCE(SUM(delivery_fee), 0) FROM `order`
+        WHERE rider_id = #{riderId}
+          AND status = 3
+          AND MONTH(delivery_time) = MONTH(NOW())
+          AND YEAR(delivery_time) = YEAR(NOW())
+    </select>
+
+    <select id="getIncomeDetail" resultType="map">
+        SELECT id AS orderId, total, delivery_fee AS deliveryFee, delivery_time AS deliveryTime
+        FROM `order`
+        WHERE rider_id = #{riderId}
+          AND status = 3
+          <if test="month > 0">
+            AND MONTH(delivery_time) = #{month}
+            AND YEAR(delivery_time) = YEAR(NOW())
+          </if>
+          <if test="month == 0">
+            AND YEAR(delivery_time) = YEAR(NOW())
+          </if>
+        ORDER BY delivery_time DESC
+    </select>
+
+    <select id="getTotalIncome" resultType="double">
+        SELECT COALESCE(SUM(delivery_fee), 0) FROM `order`
+        WHERE rider_id = #{riderId}
+          AND status = 3
+    </select>
+
+</mapper>

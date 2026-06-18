@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fr.mapper.SystemConfigMapper">
+
+    <resultMap id="SystemConfigResult" type="com.fr.entity.SystemConfig">
+        <id column="id" property="id"/>
+        <result column="config_key" property="configKey"/>
+        <result column="config_value" property="configValue"/>
+        <result column="config_name" property="configName"/>
+        <result column="description" property="description"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_at" property="updatedAt"/>
+    </resultMap>
+
+    <select id="getByKey" resultMap="SystemConfigResult">
+        SELECT id, config_key, config_value, config_name, description, created_at, updated_at
+        FROM system_config
+        WHERE config_key = #{configKey}
+    </select>
+
+    <update id="updateValue">
+        UPDATE system_config
+        SET config_value = #{configValue}, updated_at = NOW()
+        WHERE config_key = #{configKey}
+    </update>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO system_config (config_key, config_value, config_name, description)
+        VALUES (#{configKey}, #{configValue}, #{configName}, #{description})
+    </insert>
+
+</mapper>

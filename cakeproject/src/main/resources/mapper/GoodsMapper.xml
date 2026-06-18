@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fr.mapper.GoodsMapper">
+
+    <resultMap id="GoodsResult" type="com.fr.entity.Goods">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="cover" property="cover"/>
+        <result column="image1" property="image1"/>
+        <result column="image2" property="image2"/>
+        <result column="price" property="price"/>
+        <result column="intro" property="intro"/>
+        <result column="stock" property="stock"/>
+        <result column="type_id" property="typeId"/>
+        <result column="type_name" property="typeName"/>
+    </resultMap>
+
+    <select id="getAll" resultMap="GoodsResult">
+        SELECT g.id, g.name, g.cover, g.image1, g.image2, g.price, g.intro, g.stock, g.type_id, t.name as type_name
+        FROM goods g
+        LEFT JOIN type t ON g.type_id = t.id
+        ORDER BY g.id DESC
+    </select>
+
+    <select id="findByName" parameterType="String" resultMap="GoodsResult">
+        SELECT g.id, g.name, g.cover, g.image1, g.image2, g.price, g.intro, g.stock, g.type_id, t.name as type_name
+        FROM goods g
+        LEFT JOIN type t ON g.type_id = t.id
+        WHERE g.name LIKE CONCAT('%', #{name}, '%')
+        ORDER BY g.id DESC
+    </select>
+
+    <select id="findHot" resultMap="GoodsResult">
+        SELECT g.id, g.name, g.cover, g.image1, g.image2, g.price, g.intro, g.stock, g.type_id, t.name as type_name
+        FROM goods g
+        LEFT JOIN type t ON g.type_id = t.id
+        ORDER BY g.id DESC
+        LIMIT 10
+    </select>
+
+    <select id="findNow" resultMap="GoodsResult">
+        SELECT g.id, g.name, g.cover, g.image1, g.image2, g.price, g.intro, g.stock, g.type_id, t.name as type_name
+        FROM goods g
+        LEFT JOIN type t ON g.type_id = t.id
+        ORDER BY g.id DESC
+        LIMIT 10
+    </select>
+
+    <select id="findHome" resultMap="GoodsResult">
+        SELECT g.id, g.name, g.cover, g.image1, g.image2, g.price, g.intro, g.stock, g.type_id, t.name as type_name
+        FROM goods g
+        LEFT JOIN type t ON g.type_id = t.id
+        ORDER BY g.id DESC
+        LIMIT 8
+    </select>
+
+    <select id="findHomeByType" resultMap="GoodsResult">
+        SELECT g.id, g.name, g.cover, g.image1, g.image2, g.price, g.intro, g.stock, g.type_id, t.name as type_name
+        FROM goods g
+        LEFT JOIN type t ON g.type_id = t.id
+        WHERE g.type_id = #{typeId}
+        ORDER BY g.id DESC
+        LIMIT 8
+    </select>
+
+    <select id="findRecommend" resultMap="GoodsResult">
+        SELECT g.id, g.name, g.cover, g.image1, g.image2, g.price, g.intro, g.stock, g.type_id, t.name as type_name
+        FROM goods g
+        JOIN recommend r ON g.id = r.good_id
+        LEFT JOIN type t ON g.type_id = t.id
+        GROUP BY g.id
+        ORDER BY MAX(r.id) DESC
+    </select>
+
+    <select id="findRecommendByType" resultMap="GoodsResult">
+        SELECT g.id, g.name, g.cover, g.image1, g.image2, g.price, g.intro, g.stock, g.type_id, t.name as type_name
+        FROM goods g
+        JOIN recommend r ON g.id = r.good_id
+        LEFT JOIN type t ON g.type_id = t.id
+        WHERE r.type = #{type}
+        GROUP BY g.id
+        ORDER BY MAX(r.id) DESC
+    </select>
+
+    <insert id="insert" parameterType="com.fr.entity.Goods">
+        INSERT INTO goods(name, cover, image1, image2, price, intro, stock, type_id)
+        VALUES(#{name}, #{cover}, #{image1}, #{image2}, #{price}, #{intro}, #{stock}, #{typeId})
+    </insert>
+
+    <update id="update" parameterType="com.fr.entity.Goods">
+        UPDATE goods SET
+            name = #{name},
+            cover = #{cover},
+            image1 = #{image1},
+            image2 = #{image2},
+            price = #{price},
+            intro = #{intro},
+            stock = #{stock},
+            type_id = #{typeId}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM goods WHERE id = #{id}
+    </delete>
+
+    <select id="getById" parameterType="int" resultMap="GoodsResult">
+        SELECT g.id, g.name, g.cover, g.image1, g.image2, g.price, g.intro, g.stock, g.type_id, t.name as type_name
+        FROM goods g
+        LEFT JOIN type t ON g.type_id = t.id
+        WHERE g.id = #{id}
+    </select>
+
+    <update id="reduceStock" parameterType="map">
+        UPDATE goods SET stock = stock - #{amount} WHERE id = #{id} AND stock >= #{amount}
+    </update>
+
+</mapper>
