@@ -1,6 +1,7 @@
 package com.fr.service.impl;
 
 import com.fr.common.PageResult;
+import com.github.pagehelper.PageHelper;
 import com.fr.entity.DeliveryRecord;
 import com.fr.entity.Order;
 import com.fr.entity.Rider;
@@ -53,6 +54,19 @@ public class RiderServiceImpl implements RiderService {
     @Override
     public List<Rider> getAllRiders() {
         return riderMapper.getAll();
+    }
+
+    @Override
+    public PageResult<Rider> getRidersWithPage(int pageNum, int pageSize, String keyword) {
+        logger.info("分页查询骑手列表, pageNum={}, pageSize={}, keyword={}", pageNum, pageSize, keyword);
+        PageHelper.startPage(pageNum, pageSize);
+        List<Rider> riders;
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            riders = riderMapper.getByKeyword(keyword.trim());
+        } else {
+            riders = riderMapper.getAll();
+        }
+        return PageResult.of(riders);
     }
 
     @Override

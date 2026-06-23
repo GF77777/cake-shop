@@ -155,8 +155,8 @@ const isLoading = ref(false)
 const messagesContainer = ref(null)
 const isMinimized = ref(false)
 
-const avatarPosition = reactive({ x: window.innerWidth - 80, y: window.innerHeight - 150 })
-const chatPosition = reactive({ x: window.innerWidth - 370, y: window.innerHeight - 650 })
+const avatarPosition = reactive({ x: 0, y: 0 })
+const chatPosition = reactive({ x: 0, y: 0 })
 
 const chatSize = reactive({ 
   width: 350, 
@@ -446,6 +446,10 @@ const handleResize = () => {
 }
 
 onMounted(() => {
+  avatarPosition.x = 20
+  avatarPosition.y = 20
+  chatPosition.x = 20
+  chatPosition.y = 100
   window.addEventListener('resize', handleResize)
 })
 

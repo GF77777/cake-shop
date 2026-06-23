@@ -52,7 +52,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="log in displayLogs" :key="log.id">
+            <tr v-for="log in logs" :key="log.id">
               <td>{{ log.id }}</td>
               <td>{{ log.userName }}</td>
               <td>
@@ -76,7 +76,24 @@
 
       <div class="pagination-wrapper">
         <div class="pagination-info">
-          共 {{ total }} 条记录
+          共 {{ total }} 条记录，每页 {{ pageSize }} 条
+        </div>
+        <div class="pagination">
+          <button
+            @click="prevPage"
+            :disabled="currentPage === 1"
+            class="pagination-btn"
+          >
+            上一页
+          </button>
+          <span class="pagination-current">第 {{ currentPage }} / {{ totalPages }} 页</span>
+          <button
+            @click="nextPage"
+            :disabled="currentPage >= totalPages"
+            class="pagination-btn"
+          >
+            下一页
+          </button>
         </div>
       </div>
     </div>
@@ -95,22 +112,12 @@ const searchForm = ref({
   role: ''
 })
 
-const total = computed(() => logs.value.length)
+const currentPage = ref(1)
+const pageSize = ref(10)
+const total = ref(0)
 
-const displayLogs = computed(() => {
-  let filtered = logs.value
-  if (searchForm.value.userName.trim()) {
-    filtered = filtered.filter(log => 
-      log.userName.toLowerCase().includes(searchForm.value.userName.toLowerCase())
-    )
-  }
-  if (searchForm.value.operation) {
-    filtered = filtered.filter(log => log.operation === searchForm.value.operation)
-  }
-  if (searchForm.value.role) {
-    filtered = filtered.filter(log => log.role === searchForm.value.role)
-  }
-  return filtered
+const totalPages = computed(() => {
+  return Math.ceil(total.value / pageSize.value) || 1
 })
 
 const getRoleClass = (role) => {
@@ -128,7 +135,8 @@ const getOperationClass = (operation) => {
     'LOGOUT': 'op-logout',
     'ADD': 'op-add',
     'UPDATE': 'op-update',
-    'DELETE': 'op-delete'
+    'DELETE': 'op-delete',
+    'CLEAN': 'op-clean'
   }
   return classes[operation] || ''
 }
@@ -139,7 +147,8 @@ const getOperationText = (operation) => {
     'LOGOUT': '退出',
     'ADD': '添加',
     'UPDATE': '更新',
-    'DELETE': '删除'
+    'DELETE': '删除',
+    'CLEAN': '清理'
   }
   return texts[operation] || operation
 }
@@ -150,10 +159,15 @@ const formatTime = (timeStr) => {
   return date.toLocaleString('zh-CN')
 }
 
-const handleSearch = () => {}
+const handleSearch = () => {
+  currentPage.value = 1
+  fetchLogs()
+}
 
 const clearSearch = () => {
   searchForm.value = { userName: '', operation: '', role: '' }
+  currentPage.value = 1
+  fetchLogs()
 }
 
 const fetchLogs = async () => {
@@ -161,16 +175,35 @@ const fetchLogs = async () => {
   try {
     const res = await axios.get('/api/logs', {
       params: {
+        pageNum: currentPage.value,
+        pageSize: pageSize.value,
         userName: searchForm.value.userName || undefined,
         operation: searchForm.value.operation || undefined,
         role: searchForm.value.role || undefined
       }
     })
-    logs.value = res.data.data || []
+    logs.value = res.data.data.list || []
+    total.value = res.data.data.total || 0
   } catch (error) {
     console.error('获取日志失败:', error)
+    logs.value = []
+    total.value = 0
   } finally {
     loading.value = false
+  }
+}
+
+const prevPage = () => {
+  if (currentPage.value > 1) {
+    currentPage.value--
+    fetchLogs()
+  }
+}
+
+const nextPage = () => {
+  if (currentPage.value < totalPages.value) {
+    currentPage.value++
+    fetchLogs()
   }
 }
 
@@ -312,16 +345,53 @@ onMounted(() => {
 .op-add { background: #d1ecf1; color: #0c5460; }
 .op-update { background: #e3f2fd; color: #1565c0; }
 .op-delete { background: #f8d7da; color: #721c24; }
+.op-clean { background: #e2e3e5; color: #495057; }
 
 .pagination-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   padding: 20px 32px;
   border-top: 1px solid #eee;
   background-color: #fafafa;
-  text-align: center;
 }
 
 .pagination-info {
   font-size: 14px;
   color: #666;
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.pagination-btn {
+  padding: 8px 16px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-color: white;
+  color: #333;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.pagination-btn:hover:not(:disabled) {
+  background-color: #f0f0f0;
+  border-color: #ccc;
+}
+
+.pagination-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pagination-current {
+  font-size: 14px;
+  color: #666;
+  min-width: 100px;
+  text-align: center;
 }
 </style>

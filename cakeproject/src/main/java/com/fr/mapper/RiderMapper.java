@@ -15,6 +15,7 @@ public interface RiderMapper {
     Rider getByUserName(String userName);
 
     List<Rider> getAll();
+    List<Rider> getByKeyword(@Param("keyword") String keyword);
 
     int addRider(Rider rider);
 

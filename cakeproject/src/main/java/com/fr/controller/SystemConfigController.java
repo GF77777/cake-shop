@@ -9,6 +9,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/system")
 public class SystemConfigController {
@@ -20,6 +23,24 @@ public class SystemConfigController {
 
     @Autowired
     private com.fr.service.OperationLogService operationLogService;
+
+    @GetMapping("/config/stock-warning")
+    public AjaxResult<Map<String, Object>> getStockWarningConfig() {
+        logger.info("获取库存预警配置");
+        try {
+            SystemConfig config = systemConfigService.getByKey("stock_warning_threshold");
+            Map<String, Object> result = new java.util.HashMap<>();
+            if (config != null) {
+                result.put("threshold", Integer.parseInt(config.getConfigValue()));
+            } else {
+                result.put("threshold", 10); // 默认阈值
+            }
+            return AjaxResult.success("查询成功", result);
+        } catch (Exception e) {
+            logger.error("获取库存预警配置失败", e);
+            return AjaxResult.error("查询失败");
+        }
+    }
 
     @GetMapping("/config")
     public AjaxResult<SystemConfig> getConfig(@RequestParam String configKey) {

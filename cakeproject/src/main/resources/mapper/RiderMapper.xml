@@ -17,6 +17,14 @@
     <select id="getAll" resultType="com.fr.entity.Rider">
         SELECT * FROM rider ORDER BY create_time DESC
     </select>
+    
+    <select id="getByKeyword" resultType="com.fr.entity.Rider">
+        SELECT * FROM rider 
+        WHERE user_name LIKE CONCAT('%', #{keyword}, '%') 
+           OR real_name LIKE CONCAT('%', #{keyword}, '%') 
+           OR phone LIKE CONCAT('%', #{keyword}, '%')
+        ORDER BY create_time DESC
+    </select>
 
     <insert id="addRider" parameterType="com.fr.entity.Rider" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO rider (user_name, pass_word, real_name, phone, work_no, status, area, avatar)

@@ -6,6 +6,7 @@ import com.fr.common.PageResult;
 import com.fr.entity.User;
 import com.fr.service.OperationLogService;
 import com.fr.service.UserService;
+import com.fr.task.LogCleanTask;
 import com.fr.util.LogUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +27,9 @@ public class UserController {
     @Autowired
     private OperationLogService operationLogService;
 
+    @Autowired
+    private LogCleanTask logCleanTask;
+
     @GetMapping("/users")
     public AjaxResult<PageResult<User>> getAllUsers(
             @RequestParam(defaultValue = "1") int pageNum,
@@ -44,6 +48,9 @@ public class UserController {
     public AjaxResult<User> login(@RequestBody LoginRequest request, HttpServletRequest httpRequest) {
         logger.info("接收到用户登录请求, username={}", request.getUserName());
         try {
+            // 登录时检查并执行日志清理（每天只执行一次）
+            logCleanTask.cleanLogs();
+            
             User user = userService.login(request.getUserName(), request.getPassWord());
             if (user != null) {
                 String ip = getClientIp(httpRequest);
@@ -89,13 +96,20 @@ public class UserController {
         try {
             String ip = getClientIp(httpRequest);
             String role = user.getIsAdmin() == 1 ? "管理员" : "用户";
+            String displayName = user.getUserName();
+            if (displayName == null || displayName.isEmpty()) {
+                displayName = user.getName();
+            }
+            if (displayName == null || displayName.isEmpty()) {
+                displayName = "(用户)";
+            }
             operationLogService.log(
                 user.getId(),
-                user.getUserName(),
+                displayName,
                 role,
                 "LOGOUT",
                 "用户退出",
-                user.getUserName() + "(" + role + ") 退出登录",
+                displayName + "(" + role + ") 退出登录",
                 ip
             );
             return AjaxResult.success("退出成功", null);

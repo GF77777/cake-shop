@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>蛋糕商城项目 - 技术分享</title>
+  <style>
+    :root {
+      --primary: #ff6b6b;
+      --secondary: #ee5a5a;
+      --accent: #feca57;
+      --bg-dark: #1a1a2e;
+      --bg-card: #16213e;
+      --text-primary: #ffffff;
+      --text-secondary: #a0a0a0;
+      --border: #333;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    html, body {
+      height: 100%;
+      overflow: hidden;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      color: var(--text-primary);
+    }
+    
+    .slide {
+      display: none;
+      height: 100vh;
+      padding: 60px 80px;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+    
+    .slide.is-active {
+      display: flex;
+    }
+    
+    /* 封面页 */
+    .cover {
+      background: linear-gradient(135deg, #ff6b6b 0%, #ee5a5a 100%);
+      color: white;
+    }
+    
+    .cover h1 {
+      font-size: 56px;
+      margin-bottom: 20px;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+    
+    .cover .subtitle {
+      font-size: 24px;
+      opacity: 0.9;
+      margin-bottom: 40px;
+    }
+    
+    .cover .meta {
+      font-size: 16px;
+      opacity: 0.8;
+    }
+    
+    /* 内容页通用样式 */
+    .content h2 {
+      font-size: 36px;
+      color: var(--primary);
+      margin-bottom: 40px;
+    }
+    
+    .content p {
+      font-size: 18px;
+      line-height: 1.8;
+      color: var(--text-secondary);
+      max-width: 800px;
+      margin-bottom: 20px;
+    }
+    
+    /* 卡片布局 */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      max-width: 1000px;
+      margin-top: 30px;
+    }
+    
+    .card {
+      background: var(--bg-card);
+      border-radius: 12px;
+      padding: 30px;
+      border: 1px solid var(--border);
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 30px rgba(255, 107, 107, 0.2);
+    }
+    
+    .card-icon {
+      font-size: 48px;
+      margin-bottom: 15px;
+    }
+    
+    .card-title {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+    
+    .card-desc {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+    
+    /* 功能列表 */
+    .feature-list {
+      text-align: left;
+      max-width: 800px;
+    }
+    
+    .feature-list li {
+      display: flex;
+      align-items: center;
+      margin-bottom: 15px;
+      font-size: 18px;
+    }
+    
+    .feature-list .check {
+      width: 24px;
+      height: 24px;
+      background: var(--primary);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 15px;
+      font-size: 12px;
+    }
+    
+    /* 技术栈 */
+    .tech-stack {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      max-width: 900px;
+    }
+    
+    .tech-item {
+      background: var(--bg-card);
+      border-radius: 8px;
+      padding: 20px;
+      text-align: center;
+      border: 1px solid var(--border);
+    }
+    
+    .tech-item .icon {
+      font-size: 32px;
+      margin-bottom: 10px;
+    }
+    
+    .tech-item .name {
+      font-weight: 600;
+      margin-bottom: 5px;
+    }
+    
+    .tech-item .version {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+    
+    /* 架构图 */
+    .architecture {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      align-items: center;
+    }
+    
+    .layer {
+      background: var(--bg-card);
+      border-radius: 8px;
+      padding: 20px 40px;
+      border: 1px solid var(--border);
+      min-width: 400px;
+    }
+    
+    .layer-title {
+      font-weight: 600;
+      margin-bottom: 10px;
+      color: var(--primary);
+    }
+    
+    .layer-items {
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    
+    .layer-item {
+      background: rgba(255, 107, 107, 0.1);
+      padding: 8px 16px;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+    
+    /* API列表 */
+    .api-list {
+      text-align: left;
+      max-width: 900px;
+    }
+    
+    .api-item {
+      display: flex;
+      margin-bottom: 15px;
+      padding: 15px;
+      background: var(--bg-card);
+      border-radius: 8px;
+      border-left: 4px solid var(--primary);
+    }
+    
+    .api-method {
+      width: 70px;
+      font-weight: 600;
+      font-size: 14px;
+      color: var(--accent);
+    }
+    
+    .api-path {
+      flex: 1;
+      font-family: monospace;
+      font-size: 14px;
+    }
+    
+    /* KPI数据 */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      max-width: 800px;
+    }
+    
+    .kpi-card {
+      background: var(--bg-card);
+      border-radius: 12px;
+      padding: 30px;
+      text-align: center;
+      border: 1px solid var(--border);
+    }
+    
+    .kpi-value {
+      font-size: 48px;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 5px;
+    }
+    
+    .kpi-label {
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+    
+    /* 导航提示 */
+    .nav-hint {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      font-size: 14px;
+      color: var(--text-secondary);
+      opacity: 0.6;
+    }
+    
+    /* 进度条 */
+    .progress-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      height: 3px;
+      background: var(--primary);
+      transition: width 0.3s;
+    }
+    
+    /* 动画 */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .is-active .animate {
+      animation: fadeIn 0.6s ease-out;
+    }
+    
+    .animate-delay-1 { animation-delay: 0.1s; }
+    .animate-delay-2 { animation-delay: 0.2s; }
+    .animate-delay-3 { animation-delay: 0.3s; }
+    .animate-delay-4 { animation-delay: 0.4s; }
+    .animate-delay-5 { animation-delay: 0.5s; }
+  </style>
+</head>
+<body>
+  <!-- 进度条 -->
+  <div class="progress-bar" id="progress"></div>
+  
+  <!-- 封面页 -->
+  <section class="slide cover is-active">
+    <h1 class="animate">🍰 蛋糕商城项目</h1>
+    <p class="subtitle animate animate-delay-1">Cake Shop E-commerce Platform</p>
+    <div class="meta animate animate-delay-2">基于 Spring Boot + Vue.js 的全栈电商解决方案</div>
+  </section>
+  
+  <!-- 目录页 -->
+  <section class="slide content">
+    <h2 class="animate">📋 目录</h2>
+    <div class="feature-list animate animate-delay-1">
+      <li><span class="check">1</span>项目概述与功能定位</li>
+      <li><span class="check">2</span>技术架构设计</li>
+      <li><span class="check">3</span>核心功能模块</li>
+      <li><span class="check">4</span>API 接口设计</li>
+      <li><span class="check">5</span>测试与质量保障</li>
+      <li><span class="check">6</span>总结与展望</li>
+    </div>
+  </section>
+  
+  <!-- 项目概述 -->
+  <section class="slide content">
+    <h2 class="animate">🎯 项目概述</h2>
+    <p class="animate animate-delay-1">蛋糕商城是一个面向蛋糕烘焙行业的全栈电商平台，提供商品展示、在线下单、骑手配送、订单管理等完整的电商闭环服务。</p>
+    <div class="card-grid animate animate-delay-2">
+      <div class="card">
+        <div class="card-icon">👥</div>
+        <div class="card-title">用户端</div>
+        <div class="card-desc">商品浏览、购物车、订单管理、个人中心</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">🛵</div>
+        <div class="card-title">骑手端</div>
+        <div class="card-desc">订单接单、配送管理、收益统计、消息通知</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">🔧</div>
+        <div class="card-title">管理后台</div>
+        <div class="card-desc">商品管理、订单管理、骑手管理、数据统计</div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- 技术栈 -->
+  <section class="slide content">
+    <h2 class="animate">🛠️ 技术栈</h2>
+    <div class="tech-stack animate animate-delay-1">
+      <div class="tech-item">
+        <div class="icon">☕</div>
+        <div class="name">Java</div>
+        <div class="version">JDK 1.8</div>
+      </div>
+      <div class="tech-item">
+        <div class="icon">🍃</div>
+        <div class="name">Spring Boot</div>
+        <div class="version">2.7.x</div>
+      </div>
+      <div class="tech-item">
+        <div class="icon">🗄️</div>
+        <div class="name">MySQL</div>
+        <div class="version">8.0+</div>
+      </div>
+      <div class="tech-item">
+        <div class="icon">🦍</div>
+        <div class="name">MyBatis</div>
+        <div class="version">3.5.x</div>
+      </div>
+      <div class="tech-item">
+        <div class="icon">💚</div>
+        <div class="name">Vue.js</div>
+        <div class="version">3.x</div>
+      </div>
+      <div class="tech-item">
+        <div class="icon">⚡</div>
+        <div class="name">Vite</div>
+        <div class="version">7.x</div>
+      </div>
+      <div class="tech-item">
+        <div class="icon">📦</div>
+        <div class="name">Pinia</div>
+        <div class="version">2.x</div>
+      </div>
+      <div class="tech-item">
+        <div class="icon">🚦</div>
+        <div class="name">Vue Router</div>
+        <div class="version">4.x</div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- 架构设计 -->
+  <section class="slide content">
+    <h2 class="animate">🏗️ 架构设计</h2>
+    <div class="architecture animate animate-delay-1">
+      <div class="layer">
+        <div class="layer-title">📱 前端展示层</div>
+        <div class="layer-items">
+          <span class="layer-item">Vue.js 组件</span>
+          <span class="layer-item">Pinia 状态管理</span>
+          <span class="layer-item">Vue Router</span>
+        </div>
+      </div>
+      <div style="color: var(--primary); font-size: 20px;">↓ HTTP/REST ↓</div>
+      <div class="layer">
+        <div class="layer-title">🔌 控制层</div>
+        <div class="layer-items">
+          <span class="layer-item">UserController</span>
+          <span class="layer-item">OrderController</span>
+          <span class="layer-item">RiderController</span>
+          <span class="layer-item">AdminController</span>
+        </div>
+      </div>
+      <div style="color: var(--primary); font-size: 20px;">↓ Service ↓</div>
+      <div class="layer">
+        <div class="layer-title">⚙️ 业务逻辑层</div>
+        <div class="layer-items">
+          <span class="layer-item">UserService</span>
+          <span class="layer-item">OrderService</span>
+          <span class="layer-item">RiderService</span>
+          <span class="layer-item">StatisticsService</span>
+        </div>
+      </div>
+      <div style="color: var(--primary); font-size: 20px;">↓ MyBatis ↓</div>
+      <div class="layer">
+        <div class="layer-title">🗄️ 数据访问层</div>
+        <div class="layer-items">
+          <span class="layer-item">UserMapper</span>
+          <span class="layer-item">OrderMapper</span>
+          <span class="layer-item">RiderMapper</span>
+          <span class="layer-item">GoodsMapper</span>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- 核心功能 -->
+  <section class="slide content">
+    <h2 class="animate">✨ 核心功能模块</h2>
+    <div class="card-grid animate animate-delay-1">
+      <div class="card">
+        <div class="card-icon">🛒</div>
+        <div class="card-title">商品管理</div>
+        <div class="card-desc">商品展示、分类管理、库存预警、推荐系统</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">📦</div>
+        <div class="card-title">订单系统</div>
+        <div class="card-desc">在线下单、订单状态流转、订单导出、订单搜索</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">🛵</div>
+        <div class="card-title">骑手配送</div>
+        <div class="card-desc">订单抢单、配送跟踪、收益统计、消息推送</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">👤</div>
+        <div class="card-title">用户管理</div>
+        <div class="card-desc">用户注册、登录认证、权限管理、个人中心</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">📊</div>
+        <div class="card-title">数据统计</div>
+        <div class="card-desc">销售统计、订单分析、骑手绩效、库存预警</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">🔍</div>
+        <div class="card-title">AI客服</div>
+        <div class="card-desc">智能问答、订单查询、常见问题、售后支持</div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- API设计 -->
+  <section class="slide content">
+    <h2 class="animate">🔌 核心API接口</h2>
+    <div class="api-list animate animate-delay-1">
+      <div class="api-item">
+        <div class="api-method">POST</div>
+        <div class="api-path">/api/user/login</div>
+      </div>
+      <div class="api-item">
+        <div class="api-method">POST</div>
+        <div class="api-path">/api/user/register</div>
+      </div>
+      <div class="api-item">
+        <div class="api-method">GET</div>
+        <div class="api-path">/api/goods/list</div>
+      </div>
+      <div class="api-item">
+        <div class="api-method">POST</div>
+        <div class="api-path">/api/order/create</div>
+      </div>
+      <div class="api-item">
+        <div class="api-method">GET</div>
+        <div class="api-path">/api/order/list</div>
+      </div>
+      <div class="api-item">
+        <div class="api-method">PUT</div>
+        <div class="api-path">/api/order/{id}/status</div>
+      </div>
+      <div class="api-item">
+        <div class="api-method">GET</div>
+        <div class="api-path">/api/rider/orders</div>
+      </div>
+      <div class="api-item">
+        <div class="api-method">GET</div>
+        <div class="api-path">/api/statistics/sales</div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- 测试统计 -->
+  <section class="slide content">
+    <h2 class="animate">✅ 测试与质量保障</h2>
+    <div class="kpi-grid animate animate-delay-1">
+      <div class="kpi-card">
+        <div class="kpi-value">23</div>
+        <div class="kpi-label">测试用例数</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-value">100%</div>
+        <div class="kpi-label">测试通过率</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-value">7</div>
+        <div class="kpi-label">用户模块测试</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-value">9</div>
+        <div class="kpi-label">订单模块测试</div>
+      </div>
+    </div>
+    <p class="animate animate-delay-2" style="margin-top: 30px;">采用 JUnit 5 + MockMvc 进行单元测试和集成测试，覆盖用户、订单、骑手等核心模块。</p>
+  </section>
+  
+  <!-- 总结页 -->
+  <section class="slide cover">
+    <h1 class="animate">🎉 项目总结</h1>
+    <div class="feature-list" style="text-align: left; margin-top: 40px;">
+      <li><span class="check">✓</span>完整的电商业务闭环</li>
+      <li><span class="check">✓</span>前后端分离架构</li>
+      <li><span class="check">✓</span>完善的测试覆盖</li>
+      <li><span class="check">✓</span>可扩展的技术架构</li>
+    </div>
+    <p style="margin-top: 40px; opacity: 0.8;">感谢观看！</p>
+  </section>
+  
+  <!-- 导航提示 -->
+  <div class="nav-hint">← → 导航 | F 全屏 | S 演讲者模式</div>
+  
+  <script>
+    const slides = document.querySelectorAll('.slide');
+    const progressBar = document.getElementById('progress');
+    let currentSlide = 0;
+    
+    const updateProgress = () => {
+      const percent = ((currentSlide + 1) / slides.length) * 100;
+      progressBar.style.width = `${percent}%`;
+    };
+    
+    const goToSlide = (index) => {
+      if (index < 0 || index >= slides.length) return;
+      slides[currentSlide].classList.remove('is-active');
+      currentSlide = index;
+      slides[currentSlide].classList.add('is-active');
+      updateProgress();
+      history.pushState({ slide: currentSlide }, '', `#/${currentSlide + 1}`);
+    };
+    
+    const nextSlide = () => goToSlide(currentSlide + 1);
+    const prevSlide = () => goToSlide(currentSlide - 1);
+    
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ') {
+        e.preventDefault();
+        nextSlide();
+      } else if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        prevSlide();
+      } else if (e.key === 'f' || e.key === 'F') {
+        e.preventDefault();
+        document.documentElement.requestFullscreen();
+      }
+    });
+    
+    document.addEventListener('click', (e) => {
+      if (e.target === document.body || e.target.classList.contains('slide')) {
+        nextSlide();
+      }
+    });
+    
+    window.addEventListener('popstate', (e) => {
+      if (e.state && e.state.slide !== undefined) {
+        slides[currentSlide].classList.remove('is-active');
+        currentSlide = e.state.slide;
+        slides[currentSlide].classList.add('is-active');
+        updateProgress();
+      }
+    });
+    
+    updateProgress();
+  </script>
+</body>
+</html>

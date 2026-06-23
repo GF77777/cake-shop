@@ -50,6 +50,8 @@
 
 
   <router-view />
+
+  <AI客服 v-if="!isRiderPage && !isAdminPage" />
 </template>
 
 <script setup>
@@ -57,6 +59,7 @@ import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useUserStore } from '@/stores/user'
+import AI客服 from './components/AI客服.vue'
 
 const { locale } = useI18n()
 const router = useRouter()
@@ -68,9 +71,9 @@ const toggleLocale = () => {
   localStorage.setItem('locale', newLocale)
 }
 
-const handleLogout = () => {
-  userStore.logout()
-  router.push('/')
+const handleLogout = async () => {
+  await userStore.logout()
+  router.replace('/login')
 }
 
 
@@ -137,6 +140,11 @@ const isAdmin = computed(() => {
 // 判断是否在骑手页面
 const isRiderPage = computed(() => {
   return router.currentRoute.value.path.startsWith('/rider')
+})
+
+// 判断是否在管理员页面
+const isAdminPage = computed(() => {
+  return router.currentRoute.value.path.startsWith('/admin')
 })
 // ---------------
 </script>

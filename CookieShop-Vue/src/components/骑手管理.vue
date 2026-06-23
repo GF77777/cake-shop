@@ -14,8 +14,9 @@
         v-model="searchKeyword" 
         placeholder="搜索骑手账号、姓名、电话"
         class="search-input"
+        @keyup.enter="handleSearch"
       />
-      <button @click="fetchRiders" class="btn-search">搜索</button>
+      <button @click="handleSearch" class="btn-search">搜索</button>
     </div>
 
     <table class="rider-table">
@@ -56,6 +57,29 @@
 
     <div v-if="riders.length === 0" class="empty-state">
       <p>暂无骑手数据</p>
+    </div>
+
+    <div class="pagination-wrapper">
+      <div class="pagination-info">
+        共 {{ total }} 条记录，每页 {{ pageSize }} 条
+      </div>
+      <div class="pagination">
+        <button
+          @click="prevPage"
+          :disabled="currentPage === 1"
+          class="pagination-btn"
+        >
+          上一页
+        </button>
+        <span class="pagination-current">第 {{ currentPage }} / {{ totalPages }} 页</span>
+        <button
+          @click="nextPage"
+          :disabled="currentPage >= totalPages"
+          class="pagination-btn"
+        >
+          下一页
+        </button>
+      </div>
     </div>
 
     <!-- 发布公告弹窗 -->
@@ -164,7 +188,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue';
+import { ref, reactive, onMounted, computed } from 'vue';
 import axios from 'axios';
 
 const riders = ref([]);
@@ -172,6 +196,14 @@ const searchKeyword = ref('');
 const showAddModal = ref(false);
 const editingRider = ref(null);
 const showAnnouncementModal = ref(false);
+
+const currentPage = ref(1);
+const pageSize = ref(10);
+const total = ref(0);
+
+const totalPages = computed(() => {
+  return Math.ceil(total.value / pageSize.value) || 1;
+});
 
 const announcementForm = reactive({
   title: '',
@@ -193,14 +225,36 @@ const fetchRiders = async () => {
   try {
     const response = await axios.get('/api/admin/riders', {
       params: {
+        pageNum: currentPage.value,
+        pageSize: pageSize.value,
         keyword: searchKeyword.value
       }
     });
     if (response.data.code === 200) {
-      riders.value = response.data.data;
+      riders.value = response.data.data.list;
+      total.value = response.data.data.total;
     }
   } catch (error) {
     console.error('获取骑手列表失败', error);
+  }
+};
+
+const handleSearch = () => {
+  currentPage.value = 1;
+  fetchRiders();
+};
+
+const prevPage = () => {
+  if (currentPage.value > 1) {
+    currentPage.value--;
+    fetchRiders();
+  }
+};
+
+const nextPage = () => {
+  if (currentPage.value < totalPages.value) {
+    currentPage.value++;
+    fetchRiders();
   }
 };
 
@@ -502,6 +556,55 @@ onMounted(() => {
   color: #999;
   background: white;
   border-radius: 8px;
+}
+
+.pagination-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-top: 1px solid #eee;
+  background-color: #fafafa;
+  margin-top: 20px;
+}
+
+.pagination-info {
+  font-size: 14px;
+  color: #666;
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.pagination-btn {
+  padding: 8px 16px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-color: white;
+  color: #333;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.pagination-btn:hover:not(:disabled) {
+  background-color: #f0f0f0;
+  border-color: #ccc;
+}
+
+.pagination-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pagination-current {
+  font-size: 14px;
+  color: #666;
+  min-width: 100px;
+  text-align: center;
 }
 
 .modal-overlay {

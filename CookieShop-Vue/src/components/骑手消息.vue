@@ -111,9 +111,9 @@ const formatTime = (timestamp) => {
   const days = Math.floor(diff / (1000 * 60 * 60 * 24));
   
   if (minutes < 1) return t('justNow');
-  if (minutes < 60) return t('minutesAgo').replace('{n}', minutes);
-  if (hours < 24) return t('hoursAgo').replace('{n}', hours);
-  return t('daysAgo').replace('{n}', days);
+  if (minutes < 60) return t('minutesAgo', { n: minutes });
+  if (hours < 24) return t('hoursAgo', { n: hours });
+  return t('daysAgo', { n: days });
 };
 
 const loadMessages = async () => {

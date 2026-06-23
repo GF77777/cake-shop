@@ -16,6 +16,7 @@ public interface RiderService {
     Rider getByUserName(String userName);
 
     List<Rider> getAllRiders();
+    PageResult<Rider> getRidersWithPage(int pageNum, int pageSize, String keyword);
 
     int addRider(Rider rider);
 

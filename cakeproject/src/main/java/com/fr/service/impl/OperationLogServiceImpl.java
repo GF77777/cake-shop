@@ -1,8 +1,10 @@
 package com.fr.service.impl;
 
+import com.fr.common.PageResult;
 import com.fr.entity.OperationLog;
 import com.fr.mapper.OperationLogMapper;
 import com.fr.service.OperationLogService;
+import com.github.pagehelper.PageHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +47,14 @@ public class OperationLogServiceImpl implements OperationLogService {
     @Override
     public List<OperationLog> getLogsByConditions(String userName, String operation, String role) {
         return operationLogMapper.selectByConditions(userName, operation, role);
+    }
+    
+    @Override
+    public PageResult<OperationLog> getLogsWithPage(int pageNum, int pageSize, String userName, String operation, String role) {
+        logger.info("分页查询操作日志, pageNum={}, pageSize={}, userName={}, operation={}, role={}", pageNum, pageSize, userName, operation, role);
+        PageHelper.startPage(pageNum, pageSize);
+        List<OperationLog> logs = operationLogMapper.selectByConditions(userName, operation, role);
+        return PageResult.of(logs);
     }
     
     @Override

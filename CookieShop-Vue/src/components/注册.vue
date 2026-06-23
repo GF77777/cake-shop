@@ -73,7 +73,7 @@ const address = ref('');
 const registerUser = async ()=> {
     try{
         const params = new URLSearchParams();
-        params.append('username', username.value);
+        params.append('userName', username.value);
         params.append('email', email.value);
         params.append('password', password.value);
         params.append('name', recipient.value);

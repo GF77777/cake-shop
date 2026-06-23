@@ -253,7 +253,7 @@ export default {
 
     const fetchStockWarningThreshold = async () => {
       try {
-        const response = await fetch('http://localhost:8080/api/config/stock-warning');
+        const response = await fetch('/api/system/config/stock-warning');
         const data = await response.json();
         if (data.code === 200) {
           stockWarningThreshold.value = data.data.threshold;

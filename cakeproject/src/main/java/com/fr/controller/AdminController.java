@@ -1,6 +1,7 @@
 package com.fr.controller;
 
 import com.fr.common.AjaxResult;
+import com.fr.common.PageResult;
 import com.fr.entity.Rider;
 import com.fr.service.RiderService;
 import org.slf4j.Logger;
@@ -23,20 +24,14 @@ public class AdminController {
     private RiderService riderService;
 
     @GetMapping("/riders")
-    public AjaxResult<List<Rider>> getRiders(@RequestParam(required = false) String keyword) {
-        logger.info("管理员获取骑手列表, keyword={}", keyword);
+    public AjaxResult<PageResult<Rider>> getRiders(
+            @RequestParam(defaultValue = "1") int pageNum,
+            @RequestParam(defaultValue = "10") int pageSize,
+            @RequestParam(required = false) String keyword) {
+        logger.info("管理员获取骑手列表, pageNum={}, pageSize={}, keyword={}", pageNum, pageSize, keyword);
         try {
-            List<Rider> riders = riderService.getAllRiders();
-            if (keyword != null && !keyword.isEmpty()) {
-                riders = riders.stream()
-                        .filter(r -> 
-                            (r.getUserName() != null && r.getUserName().contains(keyword)) ||
-                            (r.getRealName() != null && r.getRealName().contains(keyword)) ||
-                            (r.getPhone() != null && r.getPhone().contains(keyword))
-                        )
-                        .collect(Collectors.toList());
-            }
-            return AjaxResult.success("查询成功", riders);
+            PageResult<Rider> result = riderService.getRidersWithPage(pageNum, pageSize, keyword);
+            return AjaxResult.success("查询成功", result);
         } catch (Exception e) {
             logger.error("获取骑手列表失败", e);
             return AjaxResult.error("查询失败");
