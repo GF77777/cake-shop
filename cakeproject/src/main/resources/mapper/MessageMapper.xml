@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.fr.mapper.MessageMapper">
+
+    <resultMap id="MessageResult" type="com.fr.entity.Message">
+        <id property="id" column="id"/>
+        <result property="riderId" column="rider_id"/>
+        <result property="type" column="type"/>
+        <result property="title" column="title"/>
+        <result property="content" column="content"/>
+        <result property="isRead" column="is_read"/>
+        <result property="createTime" column="create_time"/>
+    </resultMap>
+
+    <select id="getMessagesByRiderId" resultMap="MessageResult">
+        SELECT id, rider_id, type, title, content, is_read, create_time
+        FROM message
+        WHERE rider_id = #{riderId}
+        <if test="type != null and type != ''">
+            AND type = #{type}
+        </if>
+        ORDER BY create_time DESC
+    </select>
+
+    <insert id="insert" parameterType="com.fr.entity.Message">
+        INSERT INTO message (rider_id, type, title, content, is_read, create_time)
+        VALUES (#{riderId}, #{type}, #{title}, #{content}, #{isRead}, #{createTime})
+    </insert>
+
+    <update id="markAsRead">
+        UPDATE message SET is_read = 1 WHERE id = #{id}
+    </update>
+
+    <select id="countUnread" resultType="int">
+        SELECT COUNT(*) FROM message WHERE rider_id = #{riderId} AND is_read = 0
+    </select>
+
+</mapper>

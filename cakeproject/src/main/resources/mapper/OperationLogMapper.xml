@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fr.mapper.OperationLogMapper">
+    
+    <insert id="insert" parameterType="com.fr.entity.OperationLog">
+        INSERT INTO operation_log(user_id, user_name, role, operation, module, detail, ip, create_time)
+        VALUES (#{userId}, #{userName}, #{role}, #{operation}, #{module}, #{detail}, #{ip}, #{createTime})
+    </insert>
+    
+    <select id="selectAll" resultType="com.fr.entity.OperationLog">
+        SELECT * FROM operation_log ORDER BY create_time DESC
+    </select>
+    
+    <select id="selectByConditions" resultType="com.fr.entity.OperationLog">
+        SELECT * FROM operation_log WHERE 1=1
+        <if test="userName != null and userName != ''">
+            AND user_name LIKE CONCAT('%', #{userName}, '%')
+        </if>
+        <if test="operation != null and operation != ''">
+            AND operation = #{operation}
+        </if>
+        <if test="role != null and role != ''">
+            AND role = #{role}
+        </if>
+        ORDER BY create_time DESC
+    </select>
+    
+    <delete id="deleteLogsBeforeDate">
+        DELETE FROM operation_log WHERE create_time &lt; #{date}
+    </delete>
+    
+    <select id="countLogsBeforeDate" resultType="int">
+        SELECT COUNT(*) FROM operation_log WHERE create_time &lt; #{date}
+    </select>
+</mapper>

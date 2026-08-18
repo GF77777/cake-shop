@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>蛋糕商城项目测试报告</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a5a 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 36px;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        
+        .header p {
+            opacity: 0.9;
+            font-size: 16px;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            padding: 30px;
+            background: #f8f9fa;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .stat-card.success { border-top: 4px solid #28a745; }
+        .stat-card.warning { border-top: 4px solid #ffc107; }
+        .stat-card.error { border-top: 4px solid #dc3545; }
+        .stat-card.info { border-top: 4px solid #17a2b8; }
+        
+        .stat-value {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .success .stat-value { color: #28a745; }
+        .warning .stat-value { color: #ffc107; }
+        .error .stat-value { color: #dc3545; }
+        .info .stat-value { color: #17a2b8; }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #eee;
+        }
+        
+        .test-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        
+        .test-table th,
+        .test-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .test-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #555;
+        }
+        
+        .test-table tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .status-badge.passed {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-badge.failed {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .summary {
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+            border-radius: 12px;
+            padding: 25px;
+            margin-top: 30px;
+        }
+        
+        .summary h3 {
+            color: #155724;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+        
+        .summary ul {
+            list-style: none;
+            padding-left: 20px;
+        }
+        
+        .summary li {
+            color: #333;
+            margin-bottom: 8px;
+            position: relative;
+        }
+        
+        .summary li::before {
+            content: '✓';
+            position: absolute;
+            left: -20px;
+            color: #28a745;
+            font-weight: bold;
+        }
+        
+        .footer {
+            background: #333;
+            color: #fff;
+            padding: 20px;
+            text-align: center;
+            font-size: 14px;
+            opacity: 0.8;
+        }
+        
+        .footer a {
+            color: #ff6b6b;
+            text-decoration: none;
+        }
+        
+        .footer a:hover {
+            text-decoration: underline;
+        }
+        
+        .timestamp {
+            font-size: 14px;
+            color: #666;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🍰 蛋糕商城项目测试报告</h1>
+            <p>自动化测试执行结果汇总</p>
+            <div class="timestamp">生成时间: 2026年06月23日 10:09:16</div>
+        </div>
+        
+        <div class="stats">
+            <div class="stat-card success">
+                <div class="stat-value">23</div>
+                <div class="stat-label">测试用例总数</div>
+            </div>
+            <div class="stat-card success">
+                <div class="stat-value">23</div>
+                <div class="stat-label">通过用例数</div>
+            </div>
+            <div class="stat-card error">
+                <div class="stat-value">0</div>
+                <div class="stat-label">失败用例数</div>
+            </div>
+            <div class="stat-card info">
+                <div class="stat-value">100%</div>
+                <div class="stat-label">通过率</div>
+            </div>
+        </div>
+        
+        <div class="content">
+            <h2 class="section-title">📋 测试套件详情</h2>
+            
+            <table class="test-table">
+                <thead>
+                    <tr>
+                        <th>测试类</th>
+                        <th>测试数量</th>
+                        <th>通过数</th>
+                        <th>失败数</th>
+                        <th>状态</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>UserControllerTest</strong></td>
+                        <td>7</td>
+                        <td>7</td>
+                        <td>0</td>
+                        <td><span class="status-badge passed">通过</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>OrderControllerTest</strong></td>
+                        <td>9</td>
+                        <td>9</td>
+                        <td>0</td>
+                        <td><span class="status-badge passed">通过</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>AdminControllerTest</strong></td>
+                        <td>7</td>
+                        <td>7</td>
+                        <td>0</td>
+                        <td><span class="status-badge passed">通过</span></td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <h2 class="section-title">✅ 测试用例清单</h2>
+            
+            <table class="test-table">
+                <thead>
+                    <tr>
+                        <th>测试方法</th>
+                        <th>所属类</th>
+                        <th>状态</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>testRegister_Success</td><td>UserControllerTest</td><td><span class="status-badge passed">通过</span></td></tr>
+                    <tr><td>testLogin_Success</td><td>UserControllerTest</td><td><span class="status-badge passed">通过</span></td></tr>
+                    <tr><td>testLogin_WrongPassword</td><td>UserControllerTest</td><td><span class="status-badge passed">通过</span></td></tr>
+                    <tr><td>testLogin_UserNotFound</td><td>UserControllerTest</td><td><span class="status-badge passed">通过</span></td></tr>
+                    <tr><td>testLogout_Success</td><td>UserControllerTest</td><td><span class="status-badge passed">通过</span></td></tr>
+                    <tr><td>testGetUserList_Success</td><td>UserControllerTest</td><td><span class="status-badge passed">通过</span></td></tr>
+                    <tr><td>testGetUserList_Pagination</td><td>UserControllerTest</td><td><span class="status-badge passed">通过</span></td></tr>
+                    <tr><td>testGetOrderList_Success</td><td>OrderControllerTest</td><td><span class="status-badge passed">通过</span></td></tr>
+                    <tr><td>testGetOrderDetail_Success</td><td>OrderControllerTest</td><td><span class="status-badge passed">通过</span></td></tr>
+                    <tr><td>testGetOrderDetail_NotFound</td><td>OrderControllerTest</td><td><span class="status-badge passed">通过</span></td></tr>
+                    <tr><td>testCreateOrder_Success</td><td>OrderControllerTest</td><td><span class="status-badge passed">通过</span></td></tr>
+                    <tr><td>testUpdateOrderStatus_Success</td><td>OrderControllerTest</td><td><span class="status-badge passed">通过</span></td></tr>
+                    <tr><td>testDeleteOrder_Success</td><td>OrderControllerTest</td><td><span class="status-badge passed">通过</span></td></tr>
+                    <tr><td>testGetOrderList_Pagination</td><td>OrderControllerTest</td><td><span class="status-badge passed">通过</span></td></tr>
+                    <tr><td>testSearchOrders_Success</td><td>OrderControllerTest</td><td><span class="status-badge passed">通过</span></td></tr>
+                    <tr><td>testExportOrders_Success</td><td>OrderControllerTest</td><td><span class="status-badge passed">通过</span></td></tr>
+                    <tr><td>testAddRider_Success</td><td>AdminControllerTest</td><td><span class="status-badge passed">通过</span></td></tr>
+                    <tr><td>testUpdateRider_Success</td><td>AdminControllerTest</td><td><span class="status-badge passed">通过</span></td></tr>
+                    <tr><td>testDeleteRider_Success</td><td>AdminControllerTest</td><td><span class="status-badge passed">通过</span></td></tr>
+                    <tr><td>testGetRiderList_Success</td><td>AdminControllerTest</td><td><span class="status-badge passed">通过</span></td></tr>
+                    <tr><td>testSearchRiders_Success</td><td>AdminControllerTest</td><td><span class="status-badge passed">通过</span></td></tr>
+                    <tr><td>testGetOperationLogs_Success</td><td>AdminControllerTest</td><td><span class="status-badge passed">通过</span></td></tr>
+                    <tr><td>testCleanOperationLogs_Success</td><td>AdminControllerTest</td><td><span class="status-badge passed">通过</span></td></tr>
+                </tbody>
+            </table>
+            
+            <div class="summary">
+                <h3>📊 测试执行总结</h3>
+                <ul>
+                    <li>所有 23 个测试用例全部通过，测试通过率为 100%</li>
+                    <li>用户模块（7个测试）：覆盖注册、登录、登出、用户列表分页等功能</li>
+                    <li>订单模块（9个测试）：覆盖订单列表、详情、创建、更新、删除、搜索、导出等功能</li>
+                    <li>管理员模块（7个测试）：覆盖骑手管理、操作日志查询与清理等功能</li>
+                    <li>测试执行耗时：7.44秒</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>© 2026 蛋糕商城 - 自动化测试报告 | <a href="https://github.com" target="_blank">项目仓库</a></p>
+        </div>
+    </div>
+</body>
+</html>

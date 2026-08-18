@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fr.mapper.RiderMapper">
+
+    <select id="login" resultType="com.fr.entity.Rider">
+        SELECT * FROM rider WHERE user_name = #{userName} AND pass_word = #{passWord}
+    </select>
+
+    <select id="getById" resultType="com.fr.entity.Rider">
+        SELECT * FROM rider WHERE id = #{id}
+    </select>
+
+    <select id="getByUserName" resultType="com.fr.entity.Rider">
+        SELECT * FROM rider WHERE user_name = #{userName}
+    </select>
+
+    <select id="getAll" resultType="com.fr.entity.Rider">
+        SELECT * FROM rider ORDER BY create_time DESC
+    </select>
+    
+    <select id="getByKeyword" resultType="com.fr.entity.Rider">
+        SELECT * FROM rider 
+        WHERE user_name LIKE CONCAT('%', #{keyword}, '%') 
+           OR real_name LIKE CONCAT('%', #{keyword}, '%') 
+           OR phone LIKE CONCAT('%', #{keyword}, '%')
+        ORDER BY create_time DESC
+    </select>
+
+    <insert id="addRider" parameterType="com.fr.entity.Rider" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO rider (user_name, pass_word, real_name, phone, work_no, status, area, avatar)
+        VALUES (#{userName}, #{passWord}, #{realName}, #{phone}, #{workNo}, #{status}, #{area}, #{avatar})
+    </insert>
+
+    <update id="updateRider" parameterType="com.fr.entity.Rider">
+        UPDATE rider SET
+        user_name = #{userName},
+        real_name = #{realName},
+        phone = #{phone},
+        work_no = #{workNo},
+        status = #{status},
+        area = #{area},
+        avatar = #{avatar}
+        WHERE id = #{id}
+    </update>
+
+    <update id="updateRiderProfile" parameterType="com.fr.entity.Rider">
+        UPDATE rider
+        <set>
+            <if test="realName != null and realName != ''">real_name = #{realName},</if>
+            <if test="phone != null and phone != ''">phone = #{phone},</if>
+            <if test="workNo != null and workNo != ''">work_no = #{workNo},</if>
+            <if test="area != null">area = #{area},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <update id="updatePassword">
+        UPDATE rider SET pass_word = #{password} WHERE id = #{id}
+    </update>
+
+    <update id="updateStatus">
+        UPDATE rider SET status = #{status} WHERE id = #{id}
+    </update>
+
+    <delete id="deleteRider">
+        DELETE FROM rider WHERE id = #{id}
+    </delete>
+
+</mapper>
